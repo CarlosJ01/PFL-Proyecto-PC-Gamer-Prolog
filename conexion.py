@@ -12,6 +12,8 @@ prolog.consult("pc-constructor.pl")
 
 from bottle import response
 
+import json
+
 # the decorator
 def enable_cors(fn):
     def _enable_cors(*args, **kwargs):
@@ -39,8 +41,16 @@ def lvambience():
 @route('/prolog/<P>/<G>/<R>/<M>/<A>/<T>/<J>')
 @enable_cors
 def compu2(P,G,R,M,A,T,J):
-
     response.headers['Content-type'] = 'application/json'
+    '''
+    data = {}
+    data['opciones']=[]
+    data['opciones'].append({'P': '0'})
+    return (data)
+    '''
+    
+    data = {}
+    data['opciones']=[]
 
     if(P=='0'):
         P='P'
@@ -61,14 +71,53 @@ def compu2(P,G,R,M,A,T,J):
     
     #Ejecucion de prolog
     listas=list(prolog.query(consulta))
-    
-    json = {}
-    json['json'] = []
-    
-    datos = {}
-    datos['p1'] = 'a'
-    
-    json['json'].append(datos)
-    return json
+
+    if(listas==[]):
+        return "[]"
+    else:
+        for lista in listas:
+            try:
+                P=lista['P']
+            except:
+                pass
+
+            try:
+                G=lista['G']
+            except:
+                pass
+
+            try:
+                R=lista['R']
+            except:
+                pass
+
+            try:
+                M=lista['M']
+            except:
+                pass
+
+            try:
+                A=lista['A']
+            except:
+                pass
+
+            try:
+                C=lista['C']
+            except:
+                pass
+
+            try:
+                T=lista['T']
+            except:
+                pass
+
+            try:
+                J=lista['J']
+            except:
+                pass
+            
+            data['opciones'].append({'P':P,'G':G,'R':R,'M':M,'A':A,'C':C,'T':T,'J':J})   
+            
+        return (data)
 
 app.run(port=8001)

@@ -17,8 +17,8 @@
     <h5>Selecciona los componentes que desees y ve tu configuración perfecta</h5>
     <hr/>
     <div class="col-md-4 offset-md-4 mt-5">
-            <label for="Costo">Presupuesto:</label>
-            <input type="number" name="costo" class="form-control" min="0" value="0" required>
+            <label for="tope">Presupuesto:</label>
+            <input type="number" name="tope" id="tope" class="form-control" min="0" value="0" required>
         </div>
     <div class="row mt-5">
         <div class="col-md-4">
@@ -96,12 +96,24 @@
     </div>
     <br>
     <div class="text-center">
-    <button id="btn" class="btn btn-primary btn-large">Buscar Combinación</button>
+    <button type="submit" id="btn" class="btn btn-primary btn-large">Buscar Combinación</button>
     </div>
     <hr/>
-    <h5>Resultados</h5>
-    <div id="results">
-        
+    <h5 id="titulo">No hay resultados</h5>
+    <div id="results" class="d-none mt-5">
+        <table class="table table-success">
+            <thead>
+                <th>Procesador</th>
+                <th>Tarjeta Gráfica</th>
+                <th>Memoria RAM</th>
+                <th>Tarjeta Madre</th>
+                <th>Almacenamiento</th>
+                <th>Costo</th>
+            </thead>
+            <tbody id="cuerpo">
+                
+            </tbody>            
+        </table>
     </div>
 
 </div>
@@ -111,11 +123,6 @@
 <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 
 <script>
-
-let cadena = 'Hola_fa_ti';
-cadena = cadena.replace("/_/g"," ");
-console.log(cadena);
-
 $( "#procesador" ).change(function() {
     proc=$('#procesador').val();
     $("#img-procesador").attr("src","img/"+proc+".jpg");
@@ -144,12 +151,49 @@ $( "#juego" ).change(function() {
 
 <script>
 $( "#btn" ).click(function() {
+
+    $('#cuerpo').empty();
+
+    P=$('#procesador').val();
+    G=$('#grafica').val();
+    R=$('#ram').val();
+    M=$('#madre').val();
+    A=$('#disco').val();
+    T=$('#tope').val();
+    J=$('#juego').val();
+
+    if(T==0){
+        alert("Debes llenar tu presupuesto");
+    }
+    else{
+    console.log("http://127.0.0.1:8001/prolog/"+P+"/"+G+"/"+R+"/"+M+"/"+A+"/"+T+"/"+J);
+
     $.ajax({
         type: "get",
-        url: "http://127.0.0.1:8001/prolog/intel_corei7/nvidia_rtx_2080/kingston_8gb/0/0/100000/0",
+        url: "http://127.0.0.1:8001/prolog/"+P+"/"+G+"/"+R+"/"+M+"/"+A+"/"+T+"/"+J,
         dataType: "json",
         success: function (response) {
-            
+            if(response['opciones']==undefined){
+                alert("No se puede armar una PC con esas especificaciones");
+            }   
+            else{
+            $('#titulo').text("Resultados");
+            $('#results').removeClass("d-none");
+            response['opciones'].forEach(element => {
+                body=`<tr>
+                    <td>${element['P']}</td>
+                    <td>${element['G']}</td>
+                    <td>${element['R']}</td>
+                    <td>${element['M']}</td>
+                    <td>${element['A']}</td>
+                    <td>${element['C']}</td>
+                </tr>`;
+                $('#cuerpo').append(body);
+            });
+        }
+        }
+    });
+}
 });
 </script>
 
